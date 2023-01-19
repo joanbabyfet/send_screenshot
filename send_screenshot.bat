@@ -1,3 +1,3 @@
-cd C:\path\collect_girl_img-master
+cd C:\path\send_screenshot-master
 python main.py
 exit

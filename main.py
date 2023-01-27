@@ -2,9 +2,26 @@ import pyautogui
 import requests
 import configparser
 import os
+import time
 
 # 配置文件
 config_file = 'config.ini'
+
+# 撷屏
+def screen_shot():
+    try:
+        filename = 'capture.png'
+        #screen = pyautogui.screenshot(region = (0, 0, 300, 400)) # 屏幕区域截图, 左上宽高
+        screen = pyautogui.screenshot() # 屏幕截图
+        screen.save(filename)           # 保存图片
+        
+        if os.path.exists(filename):
+            send_photo(filename)      # 发送图片
+            print(f'屏幕截图 {filename} 通知成功')
+        else:
+            print(f'屏幕截图 {filename} 不存在')
+    except Exception as e:
+        print(f'屏幕截图 {e} 通知失败')
 
 # 发送图片
 def send_photo(img_url):
@@ -21,19 +38,15 @@ def send_photo(img_url):
     return resp.json()
 
 def main():
-    try:
-        filename = 'capture.png'
-        #screen = pyautogui.screenshot(region = (0, 0, 300, 400)) # 屏幕区域截图, 左上宽高
-        screen = pyautogui.screenshot() # 屏幕截图
-        screen.save(filename)           # 保存图片
-        
-        if os.path.exists(filename):
-            send_photo(filename)      # 发送图片
-            print(f'屏幕截图 {filename} 通知成功')
-        else:
-            print(f'屏幕截图 {filename} 不存在')
-    except Exception as e:
-        print(f'屏幕截图 {e} 通知失败')
+    conf = configparser.ConfigParser()
+    conf.read(config_file, encoding='utf-8') # 这里要加utf-8, 否则会报错, 默认gbk
+    config_section  = 'telegram_config'
+    seconds = conf.get(config_section, 'seconds')
+    seconds = 60 if seconds == '' else int(seconds)
+
+    while True:
+        screen_shot()
+        time.sleep(seconds) # 每N秒撷屏1次
 
 if __name__ == '__main__': # 主入口
     main()
